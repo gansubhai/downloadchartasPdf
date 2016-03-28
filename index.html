@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Export charts as PDF in angular js /Javascript by gansubhai</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Export charts as PDF in angular js /Javascript</h1>
+        <h2>Export charts in PDF</h2>
+        <a href="https://github.com/gansubhai/downloadchartasPdf" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h3>
+<a id="about-project" class="anchor" href="#about-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>About Project.</h3>
+
+<p>This project aims at adding the feature of downloading chart images in PDF format in  current angular charts.
+All charts example has been used from <a href="http://krispo.github.io/angular-nvd3/">http://krispo.github.io/angular-nvd3/</a></p>
+
+<h3>
+<a id="check-demo-at" class="anchor" href="#check-demo-at" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Check demo at</h3>
+
+<p>Example for Line charts
+<a href="http://readinspeed.com/trial/chart/downloadchartsasPDF/downloadcharts/LineChart.html">http://readinspeed.com/trial/chart/downloadchartsasPDF/downloadcharts/LineChart.html</a></p>
+
+<p>Example for Cumulative Line Chart
+<a href="http://readinspeed.com/trial/chart/downloadchartsasPDF/downloadcharts/CumalitiveLIneChart.html">http://readinspeed.com/trial/chart/downloadchartsasPDF/downloadcharts/CumalitiveLIneChart.html</a></p>
+
+<h3>
+<a id="how-to-use-it" class="anchor" href="#how-to-use-it" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use it?</h3>
+
+<p>Initially, download "Download.zip", unzip it following folder structure can be observed.</p>
+
+<ol>
+<li>bower_components</li>
+<li>CumalitiveLIneChart.html</li>
+<li>LineChart.html</li>
+</ol>
+
+<p>Run "LineChart.html" or "CumalitiveLIneChart.html" you will see the demo</p>
+
+<p>To install in your application </p>
+
+<p>1.Following imports need to be added to your HTML file</p>
+
+<pre><code>&lt;script src="bower_components/angular/angular.min.js"&gt;&lt;/script&gt;
+&lt;script src="bower_components/d3/d3.min.js"&gt;&lt;/script&gt;
+&lt;script src="bower_components/nvd3/build/nv.d3.js"&gt;&lt;/script&gt; &lt;!-- or use another assembly --&gt;
+&lt;script src="bower_components/nvd3/angular-nvd3.js"&gt;&lt;/script&gt;
+&lt;script src="bower_components/other/FileSaver.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="bower_components/other/rgbcolor.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="bower_components/other/StackBlur.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="bower_components/other/canvg.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="bower_components/other/StackBlur.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="bower_components/other/jspdf.min.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="bower_components/nvd3/build/nv.d3.css"&gt;
+</code></pre>
+
+<ol>
+<li>
+<p>Now add the following code in HTML file implementing graphs.</p>
+
+<p><code>&lt;button ng-click="exportData('testChart','filename')"&gt;Download as Pdf&lt;/button&gt;
+&lt;canvas id="canvas" width="3000" height="100"&gt;</code></p>
+</li>
+</ol>
+
+<p>Here pass 'id' of the chart and filename for the downloadable file name in exportData function eg: here id is "testChart" and downloadable filename is 'filename' so call would be "exportData('testChart','filename')"</p>
+
+<ol>
+<li>Now add following methods in your controller.</li>
+</ol>
+
+<p>//METHOD-1</p>
+
+<pre><code>`$scope.exportData = function (id,fileName) {
+var el = document.createElement( 'html' );
+el.innerHTML =document.getElementById(id).innerHTML;
+var svgContent=el.getElementsByTagName( 'svg' );
+var contentModified=svgContent[0].outerHTML;
+contentModified=contentModified.replace('style="height: 450px; width: 100%;"','style="height: 450px; width: 100%;fill:#fff;"');
+contentModified=contentModified.replace(new RegExp('style="text-anchor: middle;"', 'g'), 'style="text-anchor:   middle;fill:black;"');
+contentModified=contentModified.replace(new RegExp('style="text-anchor: end;"', 'g'), 'style="text-anchor: end;fill:black;"');
+$scope.render(contentModified,1500,500);
+};`
+</code></pre>
+
+<p>//METHOD-2</p>
+
+<pre><code>`$scope.render=function(svg, width, height,fileName){
+document.createElement('canvas')
+var c = document.createElement('canvas');
+c.width = width || 1500;
+c.height = height || 500;
+document.getElementById('canvas').innerHTML = '';
+document.getElementById('canvas').appendChild(c);
+if (typeof FlashCanvas != "undefined") {
+FlashCanvas.initElement(c);
+}
+canvg(c, svg, { log: true, renderCallback: function (dom) {
+if (typeof FlashCanvas != "undefined") {
+document.getElementById('svg').innerHTML = 'svg not supported';
+} else {
+var svg = (new XMLSerializer()).serializeToString(dom);
+var canvasdata = c.toDataURL("image/png");
+   var doc = new jsPDF();
+doc.setFontSize(40);
+doc.text(35, 25, "Sample Text added");
+doc.addImage(canvasdata, 'png', 15, 40, 230, 100);
+doc.save(fileName+'.pdf');
+}
+}});
+};`
+</code></pre>
+
+<h3>
+<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+
+<p>In 2015 <a href="https://github.com/gansubhai" class="user-mention">@gansubhai</a> created this project to provide download charts as PDF in angular charts.</p>
+
+<h3>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h3>
+
+<p>(MIT License)</p>
+
+<p>Copyright (c) 2011-2016 Ganesh More,</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+
+<h3>
+<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support or Contact</h3>
+
+<p>Having trouble with Pages? (<a href="http://readinspeed.com/#three">http://readinspeed.com/#three</a>) and we’ll help you sort it out.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/gansubhai/downloadchartasPdf/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/gansubhai/downloadchartasPdf/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/gansubhai/downloadchartasPdf"></a> is maintained by <a href="https://github.com/gansubhai">gansubhai</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
